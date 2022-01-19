@@ -1,5 +1,5 @@
 ---
-- name: This playbook setups a registry host with RHCS container images
+- name: This playbook setups a registry to store container images 
   hosts: registry
   tasks:
     - name: 'Install required packages for the registry'
