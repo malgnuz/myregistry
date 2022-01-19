@@ -3,4 +3,3 @@ ceph_image:
   tag: 5-14
 ceph_dashboard_image:
   name: registry.redhat.io/rhceph/rhceph-5-dashboard-rhel8
-
