@@ -1,0 +1,27 @@
+---
+- name: This playbook setups a registry host with RHCS container images
+  hosts: registry
+  tasks:
+    - name: 'Install required packages for the registry'
+      dnf:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - podman
+        - httpd-tools
+
+    - name: 'Create registry directories'
+      file:
+        path: "/opt/registry/{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - auth
+        - data
+        - certs
+
+    - name: 'Generate htpasswd file'
+      shell: "htpasswd -bBc /opt/registry/auth/htpasswd {{ registry_username }} {{ registry_password }}"
+
+    - name: 'Run a container with podman'
+      shell: podman run --name myregistry -p 5000:5000 -v /opt/registry/data:/var/lib/registry:z -v /opt/registry/auth:/auth:z -v /opt/registry/certs:/certs:z -e "REGISTRY_AUTH=htpasswd" -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -e REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true -d docker.io/library/registry:latest
