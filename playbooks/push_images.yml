@@ -1,6 +1,8 @@
 ---
 - name: 'This playbook pushes a set of container images to the registry'
   hosts: registry
+  vars_files:
+    - vars/main.yml
   tasks:
     - name: 'Pull the container images'
       podman_image:
@@ -9,8 +11,7 @@
         username: "{{ registry_username }}"
         password: "{{ registry_password }}"
       loop:
-        - name: "{{ ceph_image_name }}"
-          tag: "{{ ceph_image_tag | default("latest") }}"
-        - name: "{{ ceph_dashboard_image }}"
-          tag: "{{ ceph_dashboard_image_tag | default("latest") }}"
-          
+        - name: "{{ ceph_image.name }}"
+          tag: "{{ ceph_image.tag | default('latest') }}"
+        - name: "{{ ceph_dashboard_image.name }}"
+          tag: "{{ ceph_dashboard_image.tag | default('latest') }}"
