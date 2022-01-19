@@ -1,2 +1,6 @@
-ceph_image: registry.redhat.io/rhceph/rhceph-5-rhel8
-ceph_dashboard_image: registry.redhat.io/rhceph/rhceph-5-dashboard-rhel8
+ceph_image:
+  name: registry.redhat.io/rhceph/rhceph-5-rhel8
+  tag: 5-14
+ceph_dashboard_image:
+  name: registry.redhat.io/rhceph/rhceph-5-dashboard-rhel8
+
