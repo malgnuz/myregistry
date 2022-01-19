@@ -1,0 +1,2 @@
+ceph_image: registry.redhat.io/rhceph/rhceph-5-rhel8
+ceph_dashboard_image: registry.redhat.io/rhceph/rhceph-5-dashboard-rhel8
