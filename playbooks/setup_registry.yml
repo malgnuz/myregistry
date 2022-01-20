@@ -1,7 +1,16 @@
 ---
+# Example of execution: 
+# ansible-playbook setup_registry.yml -i inventory -e rh_username=${user} -e rh_password=${pass} -e registry_username=${registry_user} -e registry_password=${registry_pass} -u root -k
+
 - name: This playbook setups a registry to store container images 
   hosts: registry
   tasks:
+    - name: 'Register the system into the CDN'
+      redhat_subscription:
+        state: present
+        username: "{{ rh_username }}"
+        password: "{{ rh_password }}"
+
     - name: 'Install required packages for the registry'
       dnf:
         name: "{{ item }}"
