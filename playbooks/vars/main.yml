@@ -1,5 +1,8 @@
-ceph_image:
-  name: registry.redhat.io/rhceph/rhceph-5-rhel8
-  tag: 5-14
-ceph_dashboard_image:
-  name: registry.redhat.io/rhceph/rhceph-5-dashboard-rhel8
+# Example of vars file
+IMAGE_01:
+  name: <IMAGE_URL_LOCATION>
+  tag: <IMAGE_TAG>
+IMAGE_02:
+  name: <IMAGE_URL_LOCATION>
+  tag: <IMAGE_TAG>
+  
