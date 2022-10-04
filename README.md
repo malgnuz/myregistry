@@ -1,2 +1,2 @@
 # myregistry
-This repository setups a container registry
+This repository setups a container registry through an Ansible playbook.
