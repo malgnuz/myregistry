@@ -1,0 +1,57 @@
+---
+# tasks file for common
+---
+# tasks file for common
+- name: Register nodes
+  redhat_subscription:
+    state: present
+    username: "{{ rhcp_username }}"
+    password: "{{ rhcp_password }}"
+  register: registration
+  tags: common
+
+- name: Disable all repositories
+  rhsm_repository:
+    name: '*'
+    state: disabled
+  when: registration.changed
+  tags: common
+
+- name: Enable BaseOS and AppStreams repositories
+  rhsm_repository:
+    name: "{{ item }}"
+  loop:
+    - rhel-8-for-x86_64-appstream-rpms
+    - rhel-8-for-x86_64-baseos-rpms
+  when: registration.changed
+  tags: common
+
+- name: Install required rpms
+  dnf:
+    state: latest
+    name: "{{ required_rpms }}"
+  tags: common
+
+- name: Ensure timezone is set
+  timezone:
+    name: "{{ timezone }}"
+
+- name: Ensure required services are started and enabled
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop: "{{ required_services }}"
+  tags: common
+
+
+- name: Update all rpms to the latest version
+  dnf:
+    state: latest
+    name: "*"
+  register: update
+  tags: common
+
+- name: Reboot the nodes
+  reboot:
+  when: update.changed

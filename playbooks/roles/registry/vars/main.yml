@@ -1,0 +1,5 @@
+---
+# vars file for registry
+required_rpms:
+  - httpd-tools
+  - podman

@@ -1,0 +1,57 @@
+---
+# tasks file for registry
+- name: 'Install required packages for the registry'
+  dnf:
+    name: "{{ required_rpms }}"
+    state: latest
+  tags: registry
+
+- name: 'Create registry directories'
+  file:
+    path: "/opt/registry/{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - auth
+    - data
+    - certs
+  tags: registry
+
+- name: 'Generate htpasswd file'
+  shell: "htpasswd -bBc /opt/registry/auth/htpasswd {{ registry_user }} {{ registry_password }}"
+  tags: registry
+
+- name: 'Ensure firewalld rules allow registry communication'
+  firewalld:
+    service: "docker-registry"
+    state: enabled
+    immediate: yes
+    permanent: yes
+
+- name: 'Create a container with registry image'
+  containers.podman.podman_container:
+    name: ocp-registry
+    image: registry
+    state: stopped
+    volume:
+      - /opt/registry/data:/var/lib/registry:z
+      - /opt/registry/auth:/auth:z
+      - /opt/registry/certs:/certs:z
+    publish:
+      - "{{ registry.port }}:{{ registry.port }}"
+    env:
+      REGISTRY_AUTH: "htpasswd"
+      REGISTRY_AUTH_HTPASSWD_REALM: "Registry Realm"
+      REGISTRY_AUTH_HTPASSWD_PATH: "/auth/htpasswd"
+      REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED: "true"
+    generate_systemd:
+      path: "/usr/lib/systemd/system/"
+      container_prefix: "systemd" 
+  tags: registry
+
+- name: 'Ensure registry service is started and enabled'
+  systemd:
+    state: started
+    name: systemd-ocp-registry
+    enabled: yes
+  tags: registry

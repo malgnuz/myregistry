@@ -5,4 +5,10 @@ IMAGE_01:
 IMAGE_02:
   name: <IMAGE_URL_LOCATION>
   tag: <IMAGE_TAG>
-  
+timezone: <TIMEZONE>
+registry:
+  hostname: <HOSTNAME>
+  port: <PORT>
+  url: <REGISTRY_URL>
+  repository: <REPOSITORY>
+ 

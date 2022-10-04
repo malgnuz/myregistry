@@ -1,0 +1,9 @@
+---
+# vars file for common
+required_rpms:
+  - podman
+  - firewalld
+  - chrony
+required_services:
+  - firewalld
+  - chronyd

@@ -1,36 +1,26 @@
 ---
-# Example of execution: 
-# ansible-playbook setup_registry.yml -i inventory -e rh_username=${user} -e rh_password=${pass} -e registry_username=${registry_user} -e registry_password=${registry_pass} -u root -k
+# This playbook requires the following variables defined:
+# * rhcp_username
+# * rhcp_password
+# * ocp_version
+# * registry_user
+# * registry_password
+# Execution $ ansible-playbook playbooks/00_setup_prerequisites.yaml -i inventory --ask-vault-pass
 
-- name: This playbook setups a registry to store container images 
+---
+- name: Registry setup
   hosts: registry
+  vars_files:
+     - vars/main.yaml
+     - vars/vault.yaml
   tasks:
-    - name: 'Register the system into the CDN'
-      redhat_subscription:
-        state: present
-        username: "{{ rh_username }}"
-        password: "{{ rh_password }}"
+    - name: Ensure prerequisites are met
+      include_role:
+        name: common
+      tags: common
 
-    - name: 'Install required packages for the registry'
-      dnf:
-        name: "{{ item }}"
-        state: latest
-      loop:
-        - podman
-        - httpd-tools
-
-    - name: 'Create registry directories'
-      file:
-        path: "/opt/registry/{{ item }}"
-        state: directory
-        mode: '0755'
-      loop:
-        - auth
-        - data
-        - certs
-
-    - name: 'Generate htpasswd file'
-      shell: "htpasswd -bBc /opt/registry/auth/htpasswd {{ registry_username }} {{ registry_password }}"
-
-    - name: 'Run a container with podman'
-      shell: podman run --name myregistry -p 5000:5000 -v /opt/registry/data:/var/lib/registry:z -v /opt/registry/auth:/auth:z -v /opt/registry/certs:/certs:z -e "REGISTRY_AUTH=htpasswd" -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -e REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true -d docker.io/library/registry:latest
+    - name: Setup registry
+      include_role:
+        name: registry
+      when: inventory_hostname in groups['registry']
+      tags: registry
